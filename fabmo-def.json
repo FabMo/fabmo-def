@@ -1,0 +1,11 @@
+{
+  "auto_profile": {
+    "enabled": true,
+    "profile_name": "fabmo-profile-dt",
+    "apply_once": true,
+    "force_reapply": false
+  },
+  "created": "2025-01-15T10:30:00Z",
+  "description": "Auto-configure for DT on first boot",
+  "owner": "ShopBot customer "
+}
