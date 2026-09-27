@@ -3,7 +3,8 @@
     "enabled": true,
     "profile_name": "fabmo-profile-dt",
     "apply_once": true,
-    "force_reapply": false
+    "force_reapply": false,
+    "snapshot_name": ""
   },
   "created": "2025-01-15T10:30:00Z",
   "description": "Auto-configure for DT on first boot",

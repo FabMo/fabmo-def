@@ -1,6 +1,11 @@
-# FabMo Def (Definitions & Recovery)
+# fabmo-def — notes for Claude
 
-## Project Overview
+The one repo that is **machine- and user-specific and never overwritten by
+updates**. Installed at `/fabmo-def` on every tool. See ~/.claude/CLAUDE.md for
+the platform picture; a committed copy of that overview lives here as
+`FABMO-DEV-OVERVIEW.md` so it survives re-imaging a dev Pi.
+
+## Overview
 `fabmo-def` is a tiny, **data-only** git repository that lives **outside `/opt`** so it survives an OS reinstall, an engine update, or `/opt/fabmo` being wiped. It serves two roles for the FabMo Engine:
 
 1. **First-boot auto-profile** — `fabmo-def.json` tells the engine which machine profile (or snapshot) to apply automatically on startup, so a freshly imaged device configures itself with no user interaction.
@@ -8,15 +13,16 @@
 
 There is **no code, no build, and no dependencies here** — it is consumed by the engine in `/fabmo`. "def" = definition / default.
 
-> **Sibling repos**: Part of a three-repo system. See `/fabmo/doc/system-architecture.md` for the full deployment story, and the `CLAUDE.md` files in `/fabmo` (the engine) and `/fabmo-updater` (the online updater).
-
 ## Contents
-```
-/fabmo-def/
-├── fabmo-def.json     # Auto-profile definition (the one meaningful file)
-├── README.md          # Human docs + list of valid profile names
-└── snapshots/         # (created on demand) mirrors of user-default snapshots
-```
+- `fabmo-def.json` — startup definition. On a fresh `/opt/fabmo`, the engine
+  boots `default`, reads `auto_profile.profile_name` here, then restarts once
+  into that profile (`apply_once: true`). Valid names are the full profile
+  directory names from the engine (`fabmo-profile-dt`, `-dtmax`, `-dtatc`,
+  `-handibot-2`, `default`), not display names. A second reboot may be needed
+  for IP-address signalling.
+- `snapshots/` — user-saved snapshots of config + macros at a point in time
+  (managed by the engine's `snapshots.js`). User data: never delete or
+  regenerate.
 
 ## `fabmo-def.json`
 Read by the engine on startup. Shape:
@@ -42,19 +48,16 @@ Read by the engine on startup. Shape:
 
 Unknown top-level keys are preserved on write — treat the schema as extensible and don't drop fields you don't recognize.
 
-## How the Engine Uses This Repo
-All consuming logic lives in `/fabmo`, not here:
-- **`/fabmo/config/profile_definition.js`** — `ProfileDefinition` singleton reads/writes `/fabmo-def/fabmo-def.json` (cached ~5s, validated, atomic writes that preserve unknown keys).
-- **`/fabmo/engine.js`** — on startup checks the auto-profile; if enabled and not yet applied, applies the profile and restarts (a "double boot"). Applied state is recorded in `/opt/fabmo/config/.auto_profile_applied` (`in_progress` flag during the transition).
-- **`/fabmo/snapshots.js`** — when a user marks a snapshot as the default, it is mirrored into `/fabmo-def/snapshots/<name>/` (config + macros + `snapshot_info.json`; excludes runtime-only `instance.json` and `auth_secret`). On recovery this is preferred over generic profiles.
-
-Why outside `/opt`: `/opt/fabmo` is the mutable runtime dir and can be wiped by updates/factory reset. Keeping the definition and the blessed snapshots here makes unattended provisioning and disaster recovery possible on remote machines.
-
 ## Conventions
 - **Edit by hand or via the engine, then commit.** No scripts, no `npm`. Changes are tracked through git.
 - **Timestamps**: ISO 8601 (`2025-01-15T10:30:00Z`).
 - **Snapshot names**: `[a-zA-Z0-9_-]{1,25}`; reserved auto prefixes `auto_pre_profile_*` and `auto_pre_restore_*` (created by the engine before profile changes / restores — don't author these manually).
 - **Profile names** use the `fabmo-profile-<variant>` convention.
+- Keep this repo tiny. It is cloned onto customer machines; every file here
+  ships.
+- When a new profile is added to the engine, update the README's profile list
+  here too.
+- Changes here are rare.
 
 ## Key Files Reference
 - `fabmo-def.json` — the auto-profile directive read on every engine boot
