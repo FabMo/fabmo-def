@@ -98,3 +98,8 @@ that may be useful elsewhere); `i18nmd.md` describes an ongoing project for crea
 language translation versions of the FabMo ai; and `misc_project_layout.md` contains some
 additional details of FabMo organization -- in general this is covered in other docs as well.  
 
+## Repo-specific notes (imported)
+@/fabmo/CLAUDE.md
+@/fabmo-updater/CLAUDE.md
+@/fabmo-def/CLAUDE.md
+@/fabmo_image_builder/CLAUDE.md
